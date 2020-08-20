@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <script src="{% static 'js/Chart.min.js' %}"></script>
+    <script src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'js/logo.png' %}">
+
+   
+
+</head>
+
+<body>
+   
+    <div style="width:75%;">
+		<canvas id="canvas"></canvas>
+	</div>
+	<script>
+        $.ajax({
+            method:'GET',
+            url:'/admin/models/multi/',
+            success : function(data){
+                console.log(data);
+                var MONTHS = data.label;
+                var config = {
+                    type: 'line',
+                    data: {
+                        labels: data.label_epoch,
+                        datasets: [{
+                            label: 'Loss of training',
+                            backgroundColor: window.chartColors.red,
+                            borderColor: window.chartColors.red,
+                            data: data.LossofFitting,
+                            fill: false,
+                        }, {
+                            label: 'Loss of valisation',
+                            fill: false,
+                            backgroundColor: window.chartColors.blue,
+                            borderColor: window.chartColors.blue,
+                            data: data.LossofValidation,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true,
+                            text: 'model LSTM Simple'
+                        },
+                        tooltips: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Epoch'
+                                }
+                            },
+                            y: {
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Value of loss'
+                                }
+                            }
+                        }
+                    }
+                };
+                //window.onload = function() {
+                    var ctx = document.getElementById('canvas').getContext('2d');
+                    console.log('hello');
+                    window.myLine = new Chart(ctx, config);
+                //};
+                
+            },
+            error:function(error_data){
+                console.log(error_data);
+            }
+        });
+		
+
+	</script>
+    
+</body>
+
+</html>

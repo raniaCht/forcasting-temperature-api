@@ -1,0 +1,393 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Gentelella Alela! | </title>
+    <script src="{% static 'js/Chart.min.js' %}"></script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
+    <!-- Bootstrap -->
+    <link href="{% static 'vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="{% static 'vendors/nprogress/nprogress.css' %}" rel="stylesheet">
+    <!-- bootstrap-progressbar -->
+    <link href="{% static 'vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
+    <!-- bootstrap-daterangepicker -->
+    <link href="{% static 'vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+    
+    <!-- Custom Theme Style -->
+    <link href="{% static 'build/css/custom.min.css' %}" rel="stylesheet">
+    <script>
+        function entrainerfenetre(){
+            var window = document.getElementById('window').value
+            var type = document.getElementById('type').value
+            var batch_size = document.getElementById('batch_size').value
+            var optimizer = document.getElementById('optimizer').value
+            var learning_rate = document.getElementById('learning_rate').value
+            var epochs = document.getElementById('epochs').value
+            if(window != null || batch_size != null || learning_rate != null || epochs != null){
+                console.log(window+" "+learning_rate+" "+batch_size+" "+epochs+" "+type+" "+optimizer)
+                $.ajax({
+                    method : "GET" ,
+                    url : "/admin/models/fenetre/",
+                    data : {window : window, type : type,batch_size: batch_size,learning_rate: learning_rate,epochs:epochs, optimizer:optimizer},
+                    cache : false ,
+                    success : function(data){
+                      console.log(data.LossofFitting)
+                        var MONTHS = data.label;
+                        var config = {
+                            type: 'line',
+                            data: {
+                                labels: data.label_epoch,
+                                datasets: [{
+                                    label: 'Loss of training',
+                                    backgroundColor: 'rgb(255, 99, 132)',
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    data: data.LossofFitting,
+                                    fill: false,
+                                }, {
+                                    label: 'Loss of valisation',
+                                    fill: false,
+                                    backgroundColor: 'rgb(255, 99, 102)',
+                                    borderColor: 'rgb(255, 99, 102)',
+                                    data: data.LossofValidation,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                title: {
+                                    display: true,
+                                    text: 'model LSTM Simple'
+                                },
+                                tooltips: {
+                                    mode: 'index',
+                                    intersect: false,
+                                },
+                                hover: {
+                                    mode: 'nearest',
+                                    intersect: true
+                                },
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Epoch'
+                                        }
+                                    },
+                                    y: {
+                                        display: true,
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Value of loss'
+                                        }
+                                    }
+                                }
+                            }
+                        };
+                        //window.onload = function() {
+                            var ctx = document.getElementById('canvas').getContext('2d');
+                            console.log('hello');
+                            window.myLine = new Chart(ctx, config);
+                        //};
+                        
+                    },
+                    error:function(error_data){
+                        console.log(error_data);
+                    }
+                        });
+                        return false;
+                    }
+        }
+    </script>
+
+
+
+  </head>
+
+  <body class="nav-md">
+        
+
+        <!-- top navigation -->
+        <div class="top_nav">
+            <div class="nav_menu">
+                <nav class="nav navbar-nav">
+                <ul class=" navbar-right">
+                  <li class="nav-item dropdown open" style="padding-left: 15px;">
+                    <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
+                      <img src="images/img.jpg" alt="">John Doe
+                    </a>
+                    <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item"  href="javascript:;"> Profile</a>
+                        <a class="dropdown-item"  href="javascript:;">
+                          <span class="badge bg-red pull-right">50%</span>
+                          <span>Settings</span>
+                        </a>
+                    <a class="dropdown-item"  href="javascript:;">Help</a>
+                      <a class="dropdown-item"  href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                    </div>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="" role="main">
+        
+
+            <div style="width:75%;">
+                <canvas id="canvas"></canvas>
+            </div>
+
+
+            <div class="row">
+              <div class="col-md-4 col-sm-6 ">
+                <div class="x_panel fixed_height_320">
+                  <div class="x_title">
+                    <h2>Type du modèle</h2>
+                    
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <h4>Selectionner le type du modèle</h4>
+                    
+                    <span>Si </span>
+                    <h2></h2>
+                    <div class="mb-5">
+                        <select name="type" id="type" class="form-control">
+                            <option disabled selected hidden value="">----</option>
+                            <option value="simple">Simple modèle</option>
+                            <option value="multi">Multi Step</option>
+                        </select>
+                    </div>
+                    
+                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10" onclick="return entrainertype()">
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-6 ">
+                <div class="x_panel tile fixed_height_320">
+                  <div class="x_title">
+                    <h2>La Taille de la fenêtre</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <h4>Selectionner la taille de fenêtre</h4>
+                    
+                    <span>Si </span>
+                    <h2></h2>
+                    <div class="mb-5">
+                        <input name="fenetre" id="window" class="form-control">
+                    </div>
+                    
+                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10" onclick="return entrainerfenetre()">
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-6 ">
+                <div class="x_panel fixed_height_320">
+                  <div class="x_title">
+                    <h2>DataSet</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <div class="dashboard-widget-content">
+                      <div class="sidebar-widget" >
+                        <h4>Fichier CSV</h4>
+                        <label for="image">
+                            <input type="file" name="image" id="image" style="display:none;"/>
+                            <img src="{% static 'js/read-csv.png' %}" height="100px" width="90px" style="cursor: pointer;"/>
+                         </label>
+                      </div>
+                      <br><br><br><br><br><br><br>
+                      <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10 mt-25">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-6  widget_tally_box">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Optimiseur</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <h4>Selectionner la taille de lot</h4>
+                    
+                    <span>Si </span>
+                    <h2></h2>
+                    <div class="mb-5">
+                        <select name="" id="optimizer" class="form-control">
+                            <option disabled selected hidden value="">----</option>
+                            <option value="Adam">Adam</option>
+                            <option value="RMSprop">RMSprop</option>
+                            <option value="SGD">SGD</option>
+                        </select>
+                    </div>
+                    
+                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
+                    <br><br><br>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-6  widget_tally_box">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>La taille de lot</h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <h4>Selectionner la taille de lot</h4>
+                    
+                    <span>Si </span>
+                    <h2></h2>
+                    <div class="mb-5">
+                        <select name="" id="batch_size" class="form-control">
+                            <option disabled selected hidden value="">----</option>
+                            <option value="32">32</option>
+                            <option value="64">64</option>
+                            <option value="128">128</option>
+                            <option value="256">256</option>
+                        </select>
+                    </div>
+                    
+                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
+                    <br><br><br>
+                  </div>
+                </div>
+              </div>
+
+              <!-- start of weather widget -->
+              <div class="col-md-4 col-sm-6 ">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Le taux d'apprentissage</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <h4>Selectionner le taux d'apprentissage</h4>
+                    
+                    <span>Si </span>
+                    <h2></h2>
+                    <div class="mb-5">
+                        <select name="" id="learning_rate" class="form-control">
+                            <option disabled selected hidden value="">----</option>
+                            <option value="0.01">0.01</option>
+                            <option value="0.001">0.001</option>
+                            <option value="0.0001">0.0001</option>
+                        </select>
+                    </div>
+                    
+                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
+                    <br><br><br>
+                  </div>
+                </div>
+
+              </div>
+              <!-- end of weather widget -->
+
+              <div class="col-md-4 col-sm-6 ">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Le nombre d'épochs</h2>
+                    
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <h4>Selectionner le taux d'apprentissage</h4>
+                    
+                    <span>Si </span>
+                    <h2></h2>
+                    <div class="mb-5">
+                        <input name="" id="epochs" class="form-control">
+                    </div>
+                    
+                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
+                    <br><br><br>
+                  </div>
+                </div>
+              </div>
+
+
+              
+                
+              
+            </div>
+            
+          </div>
+
+          
+        </div>
+        <div class="ml-50" style="margin-left: 1150px;">
+            <input type="submit" value="Entrainer le modele" class="btn btn-info ml-30">
+        </div>
+        
+        <!-- /page content -->
+
+        
+      </div>
+    </div>
+    <script>
+        $("input[type='image']").click(function() {
+            $("input[id='my_file']").click();
+        });
+    </script>
+    <!-- jQuery -->
+    <script src="{% static 'vendors/jquery/dist/jquery.min.js' %}"></script>
+    <!-- Bootstrap -->
+   <script src="{% static 'vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- FastClick -->
+    <script src="{% static 'vendors/fastclick/lib/fastclick.js' %}"></script>
+    <!-- NProgress -->
+    <script src="{% static 'vendors/nprogress/nprogress.js' %}"></script>
+    <!-- Chart.js -->
+    <script src="{% static 'vendors/Chart.js/dist/Chart.min.js' %}"></script>
+    <!-- jQuery Sparklines -->
+    <script src="{% static 'vendors/jquery-sparkline/dist/jquery.sparkline.min.js' %}"></script>
+    <!-- morris.js -->
+    <script src="{% static 'vendors/raphael/raphael.min.js' %}"></script>
+    <script src="{% static 'vendors/morris.js/morris.min.js' %}"></script>
+    <!-- gauge.js -->
+    <script src="{% static 'vendors/gauge.js/dist/gauge.min.js' %}"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="{% static 'vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
+    <!-- Skycons -->
+    <script src="{% static 'vendors/skycons/skycons.js' %}"></script>
+    <!-- Flot -->
+    <script src="{% static 'vendors/Flot/jquery.flot.js' %}"></script>
+    <script src="{% static 'vendors/Flot/jquery.flot.pie.js' %}"></script>
+    <script src="{% static 'vendors/Flot/jquery.flot.time.js' %}"></script>
+    <script src="{% static 'vendors/Flot/jquery.flot.stack.js' %}"></script>
+    <script src="{% static 'vendors/Flot/jquery.flot.resize.js' %}"></script>
+    <!-- Flot plugins -->
+    <script src="{% static 'vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
+    <script src="{% static 'vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
+    <script src="{% static 'vendors/flot.curvedlines/curvedLines.js' %}"></script>
+    <!-- DateJS -->
+    <script src="{% static 'vendors/DateJS/build/date.js' %}"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="{% static 'vendors/moment/min/moment.min.js' %}"></script>
+    <script src="{% static 'vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="{% static 'build/js/custom.min.js' %}"></script>
+
+  </body>
+</html>
