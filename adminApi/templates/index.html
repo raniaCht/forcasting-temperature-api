@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Gentelella Alela! | </title>
+    <title>Entrainer le modèle </title>
     <script src="{% static 'js/Chart.min.js' %}"></script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/utils.js' %}"></script>
@@ -27,6 +27,11 @@
     <!-- Custom Theme Style -->
     <link href="{% static 'build/css/custom.min.css' %}" rel="stylesheet">
     <script>
+        function visualiser(){
+          fiilecsv = document.getElementById()
+        }
+
+
         function entrainerfenetre(){
             var window = document.getElementById('window').value
             var type = document.getElementById('type').value
@@ -144,26 +149,52 @@
 
         <!-- page content -->
         <div class="" role="main">
-        
+              <div class="col-md-8 col-sm-8  ">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Bar Graph</h2>
+                    
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
 
-            <div style="width:75%;">
-                <canvas id="canvas"></canvas>
-            </div>
+                    <div style="width:75%; height:350px;">
+                      <canvas id="canvas"></canvas>
+                  </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-4  ">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Mini Pie</h2>
+                    
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+
+                    <div id="echart_mini_pie" style="height:350px;"></div>
+
+                  </div>
+                </div>
+              </div>
 
 
-            <div class="row">
+            <!-- <div class="row"> -->
               <div class="col-md-4 col-sm-6 ">
-                <div class="x_panel fixed_height_320">
+                <div class="x_panel">
                   <div class="x_title">
                     <h2>Type du modèle</h2>
                     
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-                    <h4>Selectionner le type du modèle</h4>
+                    <!-- <h4>Selectionner le type du modèle</h4> -->
                     
-                    <span>Si </span>
-                    <h2></h2>
+                    <span>Si vous n'auriez pas sélectionner le type de modèle le système va selectionner automatiquement le type simple. </span>
+                    <br><br>
                     <div class="mb-5">
                         <select name="type" id="type" class="form-control">
                             <option disabled selected hidden value="">----</option>
@@ -172,34 +203,34 @@
                         </select>
                     </div>
                     
-                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10" onclick="return entrainertype()">
-
+                    <!-- <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10" onclick="return entrainertype()"> -->
+                      
                   </div>
                 </div>
               </div>
 
               <div class="col-md-4 col-sm-6 ">
-                <div class="x_panel tile fixed_height_320">
+                <div class="x_panel">
                   <div class="x_title">
                     <h2>La Taille de la fenêtre</h2>
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-                    <h4>Selectionner la taille de fenêtre</h4>
+                    <!-- <h4>Selectionner la taille de fenêtre</h4> -->
                     
-                    <span>Si </span>
+                    <span>Si vous n'auriez pas sélectionner la taille du window le système va selectionner automatiquement la valeur optimale pour le modèle selectionner. </span>
                     <h2></h2>
                     <div class="mb-5">
                         <input name="fenetre" id="window" class="form-control">
                     </div>
                     
-                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10" onclick="return entrainerfenetre()">
+                    <!-- <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10"> -->
 
                   </div>
                 </div>
               </div>
 
-              <div class="col-md-4 col-sm-6 ">
+              <!-- <div class="col-md-4 col-sm-6 ">
                 <div class="x_panel fixed_height_320">
                   <div class="x_title">
                     <h2>DataSet</h2>
@@ -219,7 +250,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
 
               <div class="col-md-4 col-sm-6  widget_tally_box">
                 <div class="x_panel">
@@ -228,9 +259,9 @@
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-                    <h4>Selectionner la taille de lot</h4>
+                    <!-- <h4>Selectionner la taille de lot</h4> -->
                     
-                    <span>Si </span>
+                    <span>Si vous n'auriez pas sélectionner l'optimiseur le système va selectionner automatiquement la valeur optimale pour le modèle selectionner. </span>
                     <h2></h2>
                     <div class="mb-5">
                         <select name="" id="optimizer" class="form-control">
@@ -241,8 +272,8 @@
                         </select>
                     </div>
                     
-                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
-                    <br><br><br>
+                    <!-- <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
+                    <br><br><br> -->
                   </div>
                 </div>
               </div>
@@ -254,9 +285,9 @@
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-                    <h4>Selectionner la taille de lot</h4>
+                    <!-- <h4>Selectionner la taille de lot</h4> -->
                     
-                    <span>Si </span>
+                    <span>Si vous n'auriez pas sélectionner la taille de lot le système va selectionner automatiquement la valeur optimale pour le modèle selectionner. </span>
                     <h2></h2>
                     <div class="mb-5">
                         <select name="" id="batch_size" class="form-control">
@@ -268,8 +299,8 @@
                         </select>
                     </div>
                     
-                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
-                    <br><br><br>
+                    <!-- <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
+                    <br><br><br> -->
                   </div>
                 </div>
               </div>
@@ -282,9 +313,9 @@
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
-                        <h4>Selectionner le taux d'apprentissage</h4>
+                        <!-- <h4>Selectionner le taux d'apprentissage</h4> -->
                     
-                    <span>Si </span>
+                    <span>Si vous n'auriez pas sélectionner le taux d'apprentissage le système va selectionner automatiquement la valeur optimale pour le modèle selectionner. </span>
                     <h2></h2>
                     <div class="mb-5">
                         <select name="" id="learning_rate" class="form-control">
@@ -295,8 +326,8 @@
                         </select>
                     </div>
                     
-                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
-                    <br><br><br>
+                    <!-- <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
+                    <br><br><br> -->
                   </div>
                 </div>
 
@@ -311,16 +342,16 @@
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-                    <h4>Selectionner le taux d'apprentissage</h4>
+                    <!-- <h4>Selectionner le taux d'apprentissage</h4> -->
                     
-                    <span>Si </span>
+                    <span>Si vous n'auriez pas sélectionner le nombre d'épochs le système va selectionner automatiquement la valeur optimale pour le modèle selectionner.</span>
                     <h2></h2>
                     <div class="mb-5">
                         <input name="" id="epochs" class="form-control">
                     </div>
                     
-                    <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
-                    <br><br><br>
+                    <!-- <input type="submit" value="Entrainer le modele" class="btn btn-danger ml-10">
+                    <br><br><br> -->
                   </div>
                 </div>
               </div>
@@ -335,8 +366,8 @@
 
           
         </div>
-        <div class="ml-50" style="margin-left: 1150px;">
-            <input type="submit" value="Entrainer le modele" class="btn btn-info ml-30">
+        <div class="ml-50" >
+            <input type="submit" value="Entrainer le modele" class="btn btn-info ml-30" onclick="return entrainerfenetre()">
         </div>
         
         <!-- /page content -->

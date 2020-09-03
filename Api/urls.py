@@ -19,6 +19,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/', include('accounts.urls', namespace='accounts')),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('models/', include('ModelsSimpleMulti.urls', namespace='ModelsSimpleMulti')),

@@ -8,4 +8,6 @@ class Prediction(models.Model):
 
     temperature = models.FloatField()
     date = models.DateTimeField()
+
+
     

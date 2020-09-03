@@ -1,0 +1,26 @@
+type_mod = request.GET.get('type')
+        if  type_mod == '':
+            type_mod = 'simple'
+
+        window = int(request.GET.get('window'))
+        if window == '':
+            window = int(parameter_entrainement[type_mod]['window'])
+
+        batch_size = int(request.GET.get('batch_size'))
+        if batch_size == '':
+            batch_size = int(parameter_entrainement[type_mod]['batch_size'])
+        
+        optimizer = request.GET.get('optimizer')
+        if optimizer == '':
+            optimizer = parameter_entrainement[type_mod]['optimizer']
+
+        if learning_rate == '':
+            learning_rate = float(request.GET.get('learning_rate'))
+        else:
+            learning_rate = float(parameter_entrainement[type_mod]['learning_rate'])
+
+        epochs = int(request.GET.get('epochs'))
+        if epochs != '':
+            epochs = int(parameter_entrainement[type_mod]['epochs'])
+
+        return type_mod,window,batch_size,optimizer,learning_rate,epochs

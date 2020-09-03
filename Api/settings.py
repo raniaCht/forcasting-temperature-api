@@ -28,12 +28,13 @@ SECRET_KEY = 'mf!-g@r(tsynd7zd4!)lsse)pi4z#cjfy-(s4%)1qg3!&kektm'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.43.175', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.43.175', '127.0.0.1', '192.168.1.4','192.168.1.8']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'accounts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'ModelsSimpleMulti',
     'rest_framework',
     'adminApi',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -131,30 +133,30 @@ STATICFILES_DIRS = [
 ]
 
 
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
 import tensorflow as tf
 from keras.models import load_model
 from tensorflow.keras import backend
 from keras.models import model_from_yaml
 
-
+#'./models/model_multi_yaml.yaml'
 def load_model_from_path(path):
-    # graph = tf.compat.v1.get_default_graph()
-    # model = load_model(path)
-    yaml_file = open('./models/model_multi_yaml.yaml', 'r')
+    yaml_file = open(path, 'r')
     loaded_model_yaml = yaml_file.read()
     yaml_file.close()
     loaded_model = model_from_yaml(loaded_model_yaml)
     return loaded_model
 
 def load_all_models():
-    global gModelObjs # each object is a tuple of graph, model
-    #gModelObjs = dict()
+    global gModelObjs 
 
     gModelObjs = {
-        
-
-        'simple_model': load_model_from_path('./Api/src/models/model_simple_yaml.yaml'),
-        'multi_model': load_model_from_path('./Api/src/models/model_multi_yaml.yaml'),
+        'simple_model': load_model_from_path('./models/model_simple_yaml.yaml'),
+        'multi_model': load_model_from_path('./models/model_multi_yaml.yaml'),
     }
 
 load_all_models()

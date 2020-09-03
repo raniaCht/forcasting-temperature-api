@@ -1,0 +1,654 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<!-- Meta, title, CSS, favicons, etc. -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Gentelella Alela! | </title>
+	<script src="{% static 'js/Chart.min.js' %}"></script>
+	<script src="{% static 'js/jquery.min.js' %}"></script>
+	<script src="{% static 'js/utils.js' %}"></script>
+	<!-- Bootstrap -->
+
+ 
+	<link href="{% static 'vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+	<!-- Font Awesome -->
+	<link href="{% static 'vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+	<!-- NProgress -->
+	<link href="{% static 'vendors/nprogress/nprogress.css' %}" rel="stylesheet">
+	<!-- bootstrap-progressbar -->
+	<link href="{% static 'vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
+	<!-- bootstrap-daterangepicker -->
+	<link href="{% static 'vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
+	
+	<!-- Custom Theme Style -->
+	<link href="{% static 'build/css/custom.min.css' %}" rel="stylesheet">
+	<style>
+		#echart_pie2{
+			background-image:
+			  repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
+			  repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
+			background-size: 50px 50px;
+		}
+		#echart_pie{
+			background-image:
+			  repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
+			  repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
+			background-size: 50px 50px;
+		}
+		#canvas{
+			background-image:
+			  repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
+			  repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
+			background-size: 50px 50px;
+		}
+		#canvas-holder{
+			background-image:
+			  repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
+			  repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
+			background-size: 50px 50px;
+		}
+	</style>
+	<script>
+		   
+		function visualiser(){
+			title_dataset = document.getElementById('titre');
+			filecsv = document.getElementById('dataset');
+			if(filecsv.files.length != 0){
+				$.ajax({
+
+					url: "/admin/models/visual-data/", 
+							method: "POST", 
+							data: new FormData(document.getElementById("uploadimage")), // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+							mimeTypes:"multipart/form-data",
+							contentType: false, // The content type used when sending data to the server.
+							cache: false, // To unable request pages to be cached
+							processData:false, // To send DOMDocument or non processed data file it is set to false
+							success: function(data)   // A function to be called if request succeeds
+							{
+								var MONTHS = data.data_time;
+								var config = {
+									type: 'line',
+									data: {
+										labels: data.data_time,
+										datasets: [{
+											label: 'Température',
+											backgroundColor: 'rgb(255, 99, 132)',
+											borderColor: 'rgb(0, 99, 132)',
+											data: data.temparature,
+											fill: false,
+										}]
+									},
+									options: {
+										responsive: true,
+										title: {
+											display: true,
+											text: "DataSet de "+title_dataset.value
+										},
+										tooltips: {
+											mode: 'label'
+										},
+										hover: {
+											mode: 'nearest',
+											intersect: true
+										},
+										scales: {
+											x: {
+												display: true,
+												scaleLabel: {
+													display: true,
+													labelString: 'Data Time'
+												}
+											},
+											y: {
+												display: true,
+												scaleLabel: {
+													display: true,
+													labelString: 'Température'
+												}
+											}
+										}
+									}
+								};
+								//window.onload = function() {
+									var ctx = document.getElementById('echart_pie').getContext('2d');
+									console.log('hello');
+									window.myLine = new Chart(ctx, config);
+							}
+						});
+			}
+		}
+		
+		var randomScalingFactor = function() {
+			return Math.round(Math.random() * 100);
+		};
+
+		function entrainer_model(){
+			var window = document.getElementById('window').value
+			var type_model = document.getElementById('type_model').value
+			var batch_size = document.getElementById('batch_size').value
+			var optimizer = document.getElementById('optimizer').value
+			var learning_rate = document.getElementById('learning_rate').value
+			var epochs = document.getElementById('epochs').value
+			console.log(window+" "+learning_rate+" "+batch_size+" "+epochs+" "+type_model+" "+optimizer)
+					$.ajax({
+
+					url: "/admin/models/get-dataset/", 
+							method: "POST", 
+							data: new FormData(document.getElementById("uploadimage")), // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+							mimeTypes:"multipart/form-data",
+							contentType: false, // The content type used when sending data to the server.
+							cache: false, // To unable request pages to be cached
+							processData:false, // To send DOMDocument or non processed data file it is set to false
+							success: function(data)   // A function to be called if request succeeds
+							{
+								console.log(data.LossofFitting)
+								console.log(data.done)
+								var MONTHS = data.label;
+								var config = {
+									type: 'line',
+									data: {
+										labels: data.label_epoch,
+										datasets: [{
+											label: 'Loss of training',
+											backgroundColor: 'rgb(0, 99, 132)',
+											borderColor: 'rgb(0, 99, 132)',
+											data: data.LossofFitting,
+											fill: false,
+										}, {
+											label: 'Loss of valisation',
+											fill: false,
+											backgroundColor: 'rgb(255, 99, 102)',
+											borderColor: 'rgb(255, 99, 102)',
+											data: data.LossofValidation,
+										}]
+									},
+									options: {
+										responsive: true,
+										title: {
+											display: true,
+											text: "Graphe d'erreurs"
+										},
+										tooltips: {
+											mode: 'index',
+											intersect: false,
+										},
+										hover: {
+											mode: 'nearest',
+											intersect: true
+										},
+										scales: {
+											x: {
+												display: true,
+												scaleLabel: {
+													display: true,
+													labelString: 'Epoch'
+												}
+											},
+											y: {
+												display: true,
+												scaleLabel: {
+													display: true,
+													labelString: 'Value of loss'
+												}
+											}
+										},
+									}
+								};
+								//window.onload = function() {
+									var ctx = document.getElementById('canvas').getContext('2d');
+									console.log('hello');
+									window.myLine = new Chart(ctx, config);
+
+									document.getElementById('mae').innerHTML = data.MAE;
+									document.getElementById('mse').innerHTML = data.MSE;
+									document.getElementById('rmse').innerHTML = data.RMSE;
+									document.getElementById('vaf').innerHTML = data.VAF;
+									document.getElementById('corr').innerHTML = data.corr;
+								//};
+
+								
+
+								var config = {
+									type: 'doughnut',
+									data: {
+										datasets: [{
+											data: [
+												((data.nbr_train / data.total) * 100).toFixed(2),
+												((data.nbr_valid / data.total) * 100).toFixed(2),
+											],
+											backgroundColor: [
+											'rgb(255, 199, 32)',
+											'rgb(0, 0, 232)',
+											],
+											label: 'Dataset 1'
+										}],
+										labels: [
+											'Entrainement',
+											'Validation',
+										]
+									},
+									options: {
+										responsive: true,
+										title: {
+											display: true,
+											text: 'La division de dataset'
+										},
+										animation: {
+											animateScale: true,
+											animateRotate: true
+										},
+									}
+								};
+								
+								//window.onload = function() {
+									var ctx = document.getElementById('chart-area').getContext('2d');
+									window.myDoughnut = new Chart(ctx, config);
+								//};
+								document.getElementById('nbrent').innerHTML = data.nbr_train;
+								document.getElementById('nbrval').innerHTML = data.nbr_valid;
+								document.getElementById('nbrtot').innerHTML = data.total;
+
+							},
+							error:function(error_data){
+								console.log(error_data);
+							}
+					});
+					
+		}
+	</script>
+
+
+
+  </head>
+
+  <body class="nav-md">
+		
+
+		<!-- top navigation -->
+		<div class="top_nav">
+			<div class="nav_menu">
+				<nav class="nav navbar-nav">
+				<ul class=" navbar-right">
+				  <li class="nav-item dropdown open" style="padding-left: 15px;">
+					<a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
+					  Chettab Rania
+					</a>
+					<div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+					  <a class="dropdown-item"  href="{% url 'logout' %}"><i class="fa fa-sign-out pull-right"></i> Déconnexion</a>
+					</div>
+				  </li>
+				</ul>
+			  </nav>
+			</div>
+		  </div>
+		<!-- /top navigation -->
+
+		<!-- page content -->
+		<div class="" role="main">
+			<div class="row">
+			<div class="col-md-4 col-sm-4">
+				<div class="x_panel">
+				  <div class="x_title">
+					<h2>Graphe des erreurs</h2>
+					
+					<div class="clearfix"></div>
+				  </div>
+				  <div class="x_content">
+					<div id="canvas-holder">
+						<canvas id="canvas" style="width:360px; height:300px;"></canvas>
+					</div>
+					  
+				  
+
+				  </div>
+				</div>
+			  </div>
+			  <div class="col-md-4 col-sm-4  ">
+				<!-- <div class="x_panel">
+				  <div class="x_title">
+					<h2>Graphe de prédiction</h2>
+					<div class="clearfix"></div>
+				  </div>
+				  <div class="x_content">
+
+					<canvas id="echart_pie2" style="height:300px;"></canvas>
+
+				  </div>
+				</div> -->
+
+					<div class="x_panel">
+					  <div class="x_title">
+						<h2>Dataset d'entraînement Vs Dataset de validation</h2>
+						<div class="clearfix"></div>
+					  </div>
+					  <div class="x_content">
+
+						<!-- <div style="text-align: center; margin-bottom: 17px">
+						  <span class="chart" id="dataentrain" data-percent="20">
+								<span class="percent"></span>
+						  </span>
+						  <canvas id="chart-area"></canvas>
+						</div> -->
+						<div id="canvas-holder">
+							<canvas id="chart-area" style="width:360px; height:300px;"></canvas>
+						</div>
+						<!-- <div class="pie_bg" style="text-align: center; display: none; margin-bottom: 17px">
+						  <canvas id="canvas_doughnut" height="130"></canvas>
+						</div> -->
+						<!-- <div style="text-align: center; overflow: hidden; margin: 10px 5px 3px;">
+						  <canvas id="canvas_train" height="20" ></canvas>
+						  <canvas id="canvas_valid" height="20" ></canvas>
+						</div> -->
+						<div>
+						  <ul class="list-inline widget_tally">
+							<li>
+							  <p>
+								<span class="month">Nombre des données d'entraînement </span>
+								<span class="count" id="nbrent"></span>
+							  </p>
+							</li>
+							<li>
+							  <p>
+								<span class="month">Nombre des données de validation </span>
+								<span class="count" id="nbrval"></span>
+							  </p>
+							</li>
+							<li>
+							  <p>
+								<span class="month">Nombre des données total </span>
+								<span class="count" id="nbrtot"></span>
+							  </p>
+							</li>
+						  </ul>
+						</div>
+					  </div>
+					</div>
+
+
+
+
+
+			  </div>
+
+			  
+			  <div class="col-md-4 col-sm-4 ">
+				<div class="x_panel">
+				  <div class="x_title">
+					<h2>Visualisation de données</h2>
+					
+					<div class="clearfix"></div>
+				  </div>
+				  <div class="x_content">
+
+					<canvas id="echart_pie" style="width:360px; height:300px;"></canvas>
+
+					<div class="ml-50 col-md-12 col-sm-6">
+						<input type="button" value="Visualiser les données" class="btn btn-primary ml-30" onclick="return visualiser()"> <!--  -->
+				   </div>
+
+				  </div>
+				</div>
+			  </div>
+
+			  <div class="col-md-4 col-sm-4  ">
+				<div class="x_panel">
+				  <div class="x_title">
+					<h2>Résultat</h2>
+					
+					<div class="clearfix"></div>
+				  </div>
+				  <div class="x_content">
+					
+					<table class="table">
+						<thead>
+						  <tr>
+							<th>Fonction utilisée</th>
+							<th>Valeur Obtenue</th>
+						  </tr>
+						</thead>
+						<tbody>
+						  <tr>
+							<td>Erreur absolue moyenne</td>
+							<td><samp id="mae"></samp></td>
+						  </tr>
+						  <tr>
+							<td>Erreur quadratique moyenne</td>
+							<td><samp id="mse"></samp></td>
+						  </tr>
+						  <tr>
+							<td>Racine d'erreur quadratique moyenne</td>
+							<td><samp id="rmse"></samp></td>
+						  </tr>
+						  <tr>
+							<td>Score de variance expliqué</td>
+							<td><samp id="vaf"></samp></td>
+						  </tr>
+						  <tr>
+							<td>Coefficient de corrélation de Pearson</td>
+							<td><samp id="corr"></samp></td>
+						  </tr>
+						</tbody>
+					  </table>
+				  </div>
+				</div>
+			  </div>
+			  
+			<div class="col-md-8 col-sm-8">
+			<form id="uploadimage" method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+					<div class="col-md-6 col-sm-6 ">
+					  <div class="col-md-12 col-sm-12 ">
+						  <div class="x_panel">
+							  <div class="x_title">
+								  <h2>Paramètres d'entraînement</h2>
+								  <div class="clearfix"></div>
+							  </div>
+							  <div class="x_content">
+								  <br />
+								  <div id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+									  <div class="item form-group align-center">
+										  <label class="col-form-label col-md-4 col-sm-3 label-align" for="last-name">Type du modèle</label>
+										  <div class="col-md-6 col-sm-6 ">
+											  <select id="type_model" name="type_model" class="form-control">
+												  <option disabled selected hidden value="">----</option>
+												  <option value="simple">Simple modèle</option>
+												  <option value="multi">Multi Step</option>
+											  </select>
+										  </div>
+									  </div>
+									  <div class="item form-group">
+										  <label class="col-form-label col-md-4 col-sm-3 label-align" for="last-name">Taille de fenêtre</label>
+										  <div class="col-md-6 col-sm-6 ">
+											  <select id="window" name="window" class="form-control">
+												  <option disabled selected hidden value="">----</option>
+												  <option value="24">24</option>
+												  <option value="72">72</option>
+												  <option value="144">144</option>
+											  </select>
+										  </div>
+									  </div>
+									  <div class="item form-group">
+										  <label class="col-form-label col-md-4 col-sm-3 label-align" for="last-name">Type d'optimiseur</label>
+										  <div class="col-md-6 col-sm-6 ">
+											  <select id="optimizer" name="optimizer" class="form-control">
+												  <option disabled selected hidden value="">----</option>
+												  <option value="Adam">Adam</option>
+												  <option value="RMSprop">RMSprop</option>
+												  <option value="SGD">SGD</option>
+											  </select>
+										  </div>
+									  </div>
+									  <div class="item form-group">
+										  <label class="col-form-label col-md-4 col-sm-3 label-align" for="last-name">Taille de lot</label>
+										  <div class="col-md-6 col-sm-6 ">
+											  <select id="batch_size" name="batch_size" class="form-control">
+												  <option disabled selected hidden value="">----</option>
+												  <option value="32">32</option>
+												  <option value="64">64</option>
+												  <option value="128">128</option>
+												  <option value="256">256</option>
+											  </select>
+										  </div>
+									  </div>
+									  <div class="item form-group">
+										  <label class="col-form-label col-md-4 col-sm-3 label-align" for="last-name">Taux d'apprentissage</label>
+										  <div class="col-md-6 col-sm-6 ">
+											  <select id="learning_rate" name="learning_rate" class="form-control">
+												  <option disabled selected hidden value="">----</option>
+												  <option value="0.01">0.01</option>
+												  <option value="0.001">0.001</option>
+												  <option value="0.0001">0.0001</option>
+											  </select>
+										  </div>
+									  </div>
+	  
+									  <div class="item form-group">
+										  <label class="col-form-label col-md-4 col-sm-3 label-align" for="last-name">Nombre d'épochs</label>
+										  <div class="col-md-6 col-sm-6 ">
+											  <input name="epochs" id="epochs" class="form-control">
+										  </div>
+									  </div>
+	  
+									</div>
+							  </div>
+						  </div>
+					  </div>
+					</div>
+					<div class="col-md-6 col-sm-6 ">
+					  <div class="x_panel ">
+						  <div class="x_title">
+							<h2>DataSet</h2>
+							<div class="clearfix"></div>
+						  </div>
+						  <div class="x_content">
+							<div class="dashboard-widget-content">
+							  <div class="sidebar-widget" >
+								<h4>Fichier CSV</h4>
+								<label for="dataset">
+									<input type="file" name="dataset" id="dataset" style="display:none;"/>
+									<img src="{% static 'js/read-csv.png' %}" height="150px" width="120px" style="cursor: pointer;"/>
+								 </label>
+							  </div>
+							  <div class="item form-group">
+									<div class="col-md-11 col-sm-6 ">
+										<input type="text" id="titre" name="titre" required="required" class="form-control" placeholder="Titre de dataset">
+									</div>
+								</div>
+								<div class="item form-group">
+									<div class="col-md-11 col-sm-6 ">
+										<input type="text" id="titre_mod" name="titre_mod" required="required" class="form-control" placeholder="Titre du model">
+									</div>
+								</div>
+							  <div class="item form-group">
+								  <div class="col-md-11 col-sm-6 ">
+									  <input type="text" id="format" name="format" required="required" class="form-control" placeholder="Format de la date">
+								  </div>
+							  </div>
+							  <div class="item form-group">
+								<div class="col-md-11 col-sm-6 ">
+									<input type="number" id="ordre" name="ordre" required="required" class="form-control" placeholder="Colonne de temperature">
+								</div>
+							</div> <br>
+							<div class="ml-50 col-md-12 col-sm-6">
+								<input type="button" value="Entrainer le modele" class="btn btn-info ml-30" data-toggle="modal" data-target="#exampleModal" onclick="return entrainer_model()"> <!--  -->
+						   </div>
+							<br><br><br><br>
+							</div>
+							
+						  </div>
+						</div>
+						
+
+			</form>
+			  </div>
+			</div>
+			  
+			<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h5 class="modal-title" id="exampleModalLabel">Boite de dialogue</h5>
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					  </button>
+					</div>
+					<div class="modal-body">
+					  L'entraînement de modèle va prendre un peu de temps veuillez patienter
+					</div>
+					<div class="modal-footer">
+					  <button type="button" class="btn btn-secondary" data-dismiss="modal">D'accord</button>
+					</div>
+				  </div>
+				</div>
+			</div>
+			  
+
+				
+			</div>
+			
+		  </div>
+		  
+		  
+		</div>
+		
+		
+		<!-- /page content -->
+
+		
+	  </div>
+	</div>
+	<script>
+		$("input[type='image']").click(function() {
+			$("input[id='my_file']").click();
+		});
+	</script>
+	<!-- jQuery -->
+	<script src="{% static 'vendors/jquery/dist/jquery.min.js' %}"></script>
+	<!-- Bootstrap -->
+   <script src="{% static 'vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+	<!-- FastClick -->
+	<script src="{% static 'vendors/fastclick/lib/fastclick.js' %}"></script>
+	<!-- NProgress -->
+	<script src="{% static 'vendors/nprogress/nprogress.js' %}"></script>
+	<!-- Chart.js -->
+	<script src="{% static 'vendors/Chart.js/dist/Chart.min.js' %}"></script>
+	<!-- jQuery Sparklines -->
+	<script src="{% static 'vendors/jquery-sparkline/dist/jquery.sparkline.min.js' %}"></script>
+	<!-- morris.js -->
+	<script src="{% static 'vendors/raphael/raphael.min.js' %}"></script>
+	<script src="{% static 'vendors/morris.js/morris.min.js' %}"></script>
+	<!-- gauge.js -->
+	<script src="{% static 'vendors/gauge.js/dist/gauge.min.js' %}"></script>
+	<!-- bootstrap-progressbar -->
+	<script src="{% static 'vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
+	<!-- Skycons -->
+	<script src="{% static 'vendors/skycons/skycons.js' %}"></script>
+	<!-- Flot -->
+	<script src="{% static 'vendors/Flot/jquery.flot.js' %}"></script>
+	<script src="{% static 'vendors/Flot/jquery.flot.pie.js' %}"></script>
+	<script src="{% static 'vendors/Flot/jquery.flot.time.js' %}"></script>
+	<script src="{% static 'vendors/Flot/jquery.flot.stack.js' %}"></script>
+	<script src="{% static 'vendors/Flot/jquery.flot.resize.js' %}"></script>
+	<!-- Flot plugins -->
+	<script src="{% static 'vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
+	<script src="{% static 'vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
+	<script src="{% static 'vendors/flot.curvedlines/curvedLines.js' %}"></script>
+	<!-- DateJS -->
+	<script src="{% static 'vendors/DateJS/build/date.js' %}"></script>
+	<!-- bootstrap-daterangepicker -->
+	<script src="{% static 'vendors/moment/min/moment.min.js' %}"></script>
+	<script src="{% static 'vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+	<script src="{% static 'vendors/jquery.easy-pie-chart/dist/jquery.easypiechart.min.js' %}"></script>
+
+	<!-- Custom Theme Scripts -->
+	<script src="{% static 'build/js/custom.min.js' %}"></script>
+
+
+  </body>
+</html>
