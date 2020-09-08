@@ -17,7 +17,7 @@ from keras.optimizers import SGD, Adam, RMSprop
 from sklearn.metrics import mean_absolute_error,mean_squared_error
 from sklearn.metrics import explained_variance_score
 from scipy.stats import pearsonr
-from .models import Dataset, Model
+from .models import Dataset, Model , Parametre
 
 from dateutil.relativedelta import relativedelta
 
@@ -412,6 +412,9 @@ def set_dataset(request):
     nouveau_model = model.save('media/models/'+request.POST['titre_mod'].replace(' ','_')+'.h5')
     nouveau_model = Model(titre=request.POST['titre_mod'],window=window,dataset=dataset_obj,model='models/'+request.POST['titre_mod'].replace(' ','_')+'.h5',type_mod=type_mod)
     nouveau_model.save()
+    parametre = Parametre(model=nouveau_model,batch_size=batch_size,optimizer=optimizer,learning_rate=learning_rate,epochs=epochs)
+    parametre.save()
+
     print(nouveau_model.model)
     try:
         lstm_valid_pred = model.predict(X_valid_reformer)

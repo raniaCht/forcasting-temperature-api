@@ -26,5 +26,13 @@ class Model(models.Model):
     type_mod = models.CharField(max_length=20, default='simple')
     dataset = models.ForeignKey('Dataset', on_delete=models.CASCADE)
 
+
+class Parametre(models.Model):
+    model = models.ForeignKey('Model', on_delete=models.CASCADE)
+    batch_size = models.IntegerField()
+    optimizer = models.CharField(max_length=10)
+    learning_rate = models.FloatField()
+    epochs = models.IntegerField()
+
       
 

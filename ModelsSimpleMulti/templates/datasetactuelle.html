@@ -34,7 +34,7 @@
             if(modelchoisi != ''){
                 console.log(modelchoisi);
                 $.ajax({
-					url: "/models/temperature-autre-ville/", 
+					url: "/models/temperature-actuelle-autre-ville/", 
 					method: "GET", 
                     data: {modelchoisi:modelchoisi},
                     dataType:"json",
@@ -147,7 +147,7 @@
               <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">OPTIONS</button>
             </form>
           {% endif %} -->
-
+          
           {% if request.get_full_path == '/models/chosse-model/' %}
           <form class="button-form" action="{% url 'ModelsSimpleMulti:datasetactuelle' %}">
             <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">Actuelle</button>

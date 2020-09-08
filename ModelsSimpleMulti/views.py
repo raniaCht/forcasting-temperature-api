@@ -15,7 +15,7 @@ from keras.models import load_model
 from adminApi.models import Model, Dataset
 
 from .models import Prediction
-from .serializers import PredictionSerializer
+from .serializers import PredictionSerializer, DatasetSerializer
 # Create your views here.
 
 
@@ -236,9 +236,32 @@ def temperatureactuel(request):
     temperature_current = dataset.values[dataset.index == dateactuel]
     print("temperature actuel ======= ", temperature_current)
     while (len(temperature_current) == 0):
-        r = requests.get('http://127.0.0.1:8000/models/multi/')
+        r = requests.get('http://192.168.43.175:8000/models/multi/')
         print("statut of request :", r.status_code)
         dataset = pd.read_csv('C:/Users/Rania/Desktop/Api/src/ModelsSimpleMulti/out.csv',index_col=0,header=0,error_bad_lines=False)
+        dataset.index = pd.to_datetime(dataset.index, format="%Y-%m-%d %H:%M:%S")
+        temperature_current = dataset.values[dataset.index == dateactuel]
+        print("temperature actuel ======= ", temperature_current)
+    return Response([{ 'temperature_current' :temperature_current[0][0]},])
+
+
+
+@api_view(['GET'])
+def temperatureactuelville(request):
+    modelchoisi = request.GET.get('modelchoisi')
+
+    print('ani hnaaaa ====',modelchoisi)
+    dataset_obj = Dataset.objects.get(id=modelchoisi)
+    dataset = pd.read_csv("C:/Users/Rania/Desktop/Api/src/"+dataset_obj.dataset.url,index_col=0,header=0)
+    dataset.index = pd.to_datetime(dataset.index, format="%Y-%m-%d %H:%M:%S")
+    indexactuel = datetime.now()
+    dateactuel = datetime(indexactuel.year, indexactuel.month, indexactuel.day,indexactuel.hour,00,00)
+    temperature_current = dataset.values[dataset.index == dateactuel]
+    print("temperature actuel ======= ", temperature_current)
+    while (len(temperature_current) == 0):
+        r = requests.get('http://192.168.43.175:8000/models/temperature-autre-ville/?modelchoisi='+modelchoisi)
+        print("statut of request :", r.status_code)
+        dataset = pd.read_csv("C:/Users/Rania/Desktop/Api/src/"+dataset_obj.dataset.url,index_col=0,header=0,error_bad_lines=False)
         dataset.index = pd.to_datetime(dataset.index, format="%Y-%m-%d %H:%M:%S")
         temperature_current = dataset.values[dataset.index == dateactuel]
         print("temperature actuel ======= ", temperature_current)
@@ -249,6 +272,10 @@ def temperatureactuel(request):
 def dataset(request):
     list_models = Dataset.objects.all()
     return render(request, 'test_dataset.html', {'list_models':list_models})
+
+def datasetactuelle(request):
+    list_models = Dataset.objects.all()
+    return render(request, 'datasetactuelle.html', {'list_models':list_models})
 
 @api_view(['GET'])
 def changemodelresultat(request):
@@ -341,3 +368,10 @@ def save_data_ville(predictions, max_date,url):
             # prediction.save()
     out.close()
     return predictionsBD
+
+
+@api_view(['GET'])
+def dataset_mobil(request):
+    list_models = Dataset.objects.all()
+    data = DatasetSerializer(list_models, many=True).data
+    return Response(data)

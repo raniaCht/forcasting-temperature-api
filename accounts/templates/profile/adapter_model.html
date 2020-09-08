@@ -55,97 +55,61 @@
 		}
 	</style>
 	<script>
-		   
-		function visualiser(){
-			title_dataset = document.getElementById('titre');
-			filecsv = document.getElementById('dataset');
-			if(filecsv.files.length != 0){
-				$.ajax({
 
-					url: "/admin/models/visual-data/", 
-							method: "POST", 
-							data: new FormData(document.getElementById("uploadimage")), // Data sent to server, a set of key/value pairs (i.e. form fields and values)
-							mimeTypes:"multipart/form-data",
-							contentType: false, // The content type used when sending data to the server.
-							cache: false, // To unable request pages to be cached
-							processData:false, // To send DOMDocument or non processed data file it is set to false
-							success: function(data)   // A function to be called if request succeeds
-							{
-								var MONTHS = data.data_time;
-								var config = {
-									type: 'line',
-									data: {
-										labels: data.data_time,
-										datasets: [{
-											label: 'Température',
-											backgroundColor: 'rgb(255, 99, 132)',
-											borderColor: 'rgb(0, 99, 132)',
-											data: data.temparature,
-											fill: false,
-										}]
-									},
-									options: {
-										responsive: true,
-										title: {
-											display: true,
-											text: "DataSet de "+title_dataset.value
-										},
-										tooltips: {
-											mode: 'label'
-										},
-										hover: {
-											mode: 'nearest',
-											intersect: true
-										},
-										scales: {
-											x: {
-												display: true,
-												scaleLabel: {
-													display: true,
-													labelString: 'Data Time'
-												}
-											},
-											y: {
-												display: true,
-												scaleLabel: {
-													display: true,
-													labelString: 'Température'
-												}
-											}
-										}
-									}
-								};
-								//window.onload = function() {
-									var ctx = document.getElementById('echart_pie').getContext('2d');
-									console.log('hello');
-									window.myLine = new Chart(ctx, config);
-							}
-						});
-			}
-		}
+        $(document).ready(function() {
+            var demoSelectValue = $("#idmodel").val();
+            if (demoSelectValue == "") {
+                $("#entrainermodelbtn").prop('disabled', true);
+            }else{
+                $("#entrainermodelbtn").prop('disabled', false);
+            }
+        });
+           
+        function get_parametre_model(){
+            var modelchoisi = document.getElementById('modelchoisi').value
+            if(modelchoisi != ""){
+                $.ajax({
+                    url: "/accounts/get-parametre-model/", 
+					method: "POST", 
+					data: {modelchoisi:modelchoisi}, 
+					cache: false,
+					success: function(data){
+                        $('#idmodel').val(data.id_model);
+                        $('#idataset').val(data.id_dataset);
+                        $("#entrainermodelbtn").prop('disabled', false);
+                        $('#window').val(data.window);
+                        $('#batch_size').val(data.batch_size);
+                        $('#optimizer').val(data.optimizer);
+                        $('#learning_rate').val(data.learning_rate);
+                        $('#epochs').val(data.epochs);
+                    }
+                });
+            }
+        }
 		
 		var randomScalingFactor = function() {
 			return Math.round(Math.random() * 100);
 		};
 
 		function entrainer_model(){
+            var idataset = document.getElementById('idataset').value
+            var idmodel = document.getElementById('idmodel').value
 			var window = document.getElementById('window').value
-			var type_model = document.getElementById('type_model').value
 			var batch_size = document.getElementById('batch_size').value
 			var optimizer = document.getElementById('optimizer').value
 			var learning_rate = document.getElementById('learning_rate').value
 			var epochs = document.getElementById('epochs').value
-			console.log(window+" "+learning_rate+" "+batch_size+" "+epochs+" "+type_model+" "+optimizer)
+			console.log(window+" "+learning_rate+" "+batch_size+" "+epochs+" "+optimizer+' '+idataset+' '+idmodel)
 					$.ajax({
 
-					url: "/admin/models/get-dataset/", 
-							method: "POST", 
-							data: new FormData(document.getElementById("uploadimage")), // Data sent to server, a set of key/value pairs (i.e. form fields and values)
+					url: "/accounts/transfer-learning/", 
+					method: "POST", 
+					data: new FormData(document.getElementById("uploadimage")), 
 							mimeTypes:"multipart/form-data",
-							contentType: false, // The content type used when sending data to the server.
-							cache: false, // To unable request pages to be cached
-							processData:false, // To send DOMDocument or non processed data file it is set to false
-							success: function(data)   // A function to be called if request succeeds
+							contentType: false, 
+							cache: false,
+							processData:false, 
+							success: function(data) 
 							{
 								console.log(data.LossofFitting)
 								console.log(data.done)
@@ -212,48 +176,6 @@
 									document.getElementById('corr').innerHTML = data.corr;
 								//};
 
-								
-
-								var config = {
-									type: 'doughnut',
-									data: {
-										datasets: [{
-											data: [
-												((data.nbr_train / data.total) * 100).toFixed(2),
-												((data.nbr_valid / data.total) * 100).toFixed(2),
-											],
-											backgroundColor: [
-											'rgb(255, 199, 32)',
-											'rgb(0, 0, 232)',
-											],
-											label: 'Dataset 1'
-										}],
-										labels: [
-											'Entrainement',
-											'Validation',
-										]
-									},
-									options: {
-										responsive: true,
-										title: {
-											display: true,
-											text: 'La division de dataset'
-										},
-										animation: {
-											animateScale: true,
-											animateRotate: true
-										},
-									}
-								};
-								
-								//window.onload = function() {
-									var ctx = document.getElementById('chart-area').getContext('2d');
-									window.myDoughnut = new Chart(ctx, config);
-								//};
-								document.getElementById('nbrent').innerHTML = data.nbr_train;
-								document.getElementById('nbrval').innerHTML = data.nbr_valid;
-								document.getElementById('nbrtot').innerHTML = data.total;
-
 							},
 							error:function(error_data){
 								console.log(error_data);
@@ -280,7 +202,7 @@
 					  Chettab Rania
 					</a>
 					<div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item"  href="{% url 'accounts:adapter_model' %}"> Améliorer un modèle</a>
+						<a class="dropdown-item"  href="{% url 'accounts:profil' %}">Nouvelle Ville</a>
 					  <a class="dropdown-item"  href="{% url 'logout' %}"><i class="fa fa-sign-out pull-right"></i> Déconnexion</a>
 					</div>
 				  </li>
@@ -301,25 +223,44 @@
                 <div class="col-md-12">
                   <div class="x_panel">
                     <div class="x_title">
-                      <h2>Nouveau modèle <small> Entraîner le modèle sur nouveau dataset</small></h2>
+                      <h2>Adapter un modèle <small></small></h2>
                       <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
+
+
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 " >
+                                <div class="x_panel">
+                                    <div class="x_content">
+                                        <select name="modelchoisi" id="modelchoisi" class="form-control">
+                                            <option value="">---</option>
+                                            {% for model in models %}
+                                              <option value="{{ model.id }}">{{ model.titre }}</option>
+                                            {% endfor %}
+										</select>
+										<br>
+                                        <button class="btn btn-success" onclick="return get_parametre_model()">OK</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
   
                       <div class="row">
-                      <div class="col-md-12" >
+                      <div class="col-md-4 col-sm-4 " >
               <form id="uploadimage" method="POST" enctype="multipart/form-data">
                   {% csrf_token %}
-                        <div class="col-md-6" style="padding: 30px">
-                            <div class="x_panel">
+                            <div class="x_panel" style="height: 450px;">
                                 <div class="x_title">
                                     <h2>Paramètres d'entraînement</h2>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
                                     <br />
+                                    <input type="hidden" name="idataset" id="idataset" value="">
+                                    <input type="hidden" name="idmodel" id="idmodel" value="">
                                     <div id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
-                                        <div class="item form-group align-center">
+                                        <!-- <div class="item form-group align-center">
                                             <label class="col-form-label col-md-4 col-sm-3 label-align" for="last-name">Type du modèle</label>
                                             <div class="col-md-6 col-sm-6 ">
                                                 <select id="type_model" name="type_model" class="form-control">
@@ -329,7 +270,7 @@
 												</select>
 												
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <div class="item form-group">
                                             <label class="col-form-label col-md-4 col-sm-3 label-align" for="last-name">Taille de fenêtre</label>
                                             <div class="col-md-6 col-sm-6 ">
@@ -382,211 +323,90 @@
                                                 <input name="epochs" id="epochs" class="form-control">
                                             </div>
                                         </div>
+
+                                        <div class="ml-50 col-md-12 col-sm-6">
+                                            <input type="button" value="Entrainer le modele" class="btn btn-info ml-30" data-toggle="modal" data-target="#exampleModal" id="entrainermodelbtn" onclick="return entrainer_model()"> <!--  -->
+                                       </div>
         
                                       </div>
                                 </div>
                             </div>
-                      </div>
-                      <div class="col-md-6" style="padding: 30px">
-                        <div class="x_panel ">
-                            <div class="x_title">
-                              <h2>DataSet</h2>
-                              <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                              <div class="dashboard-widget-content">
-                                <div class="sidebar-widget" >
-                                  <h4>Fichier CSV</h4>
-                                  <label for="dataset">
-                                      <input type="file" name="dataset" id="dataset" style="display:none;"/>
-                                      <img src="{% static 'js/read-csv.png' %}" height="150px" width="120px" style="cursor: pointer;"/>
-                                   </label>
-								</div>
-                                <div class="item form-group">
-                                      <div class="col-md-11 col-sm-6 ">
-                                          <input type="text" id="titre" name="titre" required="required" class="form-control" placeholder="Titre de dataset">
-                                      </div>
-                                  </div>
-                                  <div class="item form-group">
-                                      <div class="col-md-11 col-sm-6 ">
-                                          <input type="text" id="titre_mod" name="titre_mod" required="required" class="form-control" placeholder="Titre du model">
-                                      </div>
-                                  </div>
-                                <div class="item form-group">
-                                    <div class="col-md-11 col-sm-6 ">
-                                        <input type="text" id="format" name="format" required="required" class="form-control" placeholder="Format de la date">
-                                    </div>
-                                </div>
-                                <div class="item form-group">
-                                  <div class="col-md-11 col-sm-6 ">
-                                      <input type="number" id="ordre" name="ordre" required="required" class="form-control" placeholder="Colonne de temperature">
-                                  </div>
-                              </div> <br>
-                              <div class="ml-50 col-md-12 col-sm-6">
-                                  <input type="button" value="Entrainer le modele" class="btn btn-info ml-30" data-toggle="modal" data-target="#exampleModal" onclick="return entrainer_model()"> <!--  -->
-                             </div>
-                              <br><br><br><br>
-                              </div>
-                              
-                            </div>
-                          </div>
-                      </div>	
+                      	
   
               </form>
                 </div>
-                      </div>
-                      <div class="clearfix"></div>
-  
-  
-                      <div class="row">
-                        <div class="col-md-4 col-sm-4">
-                  <div class="x_panel">
-                    <div class="x_title">
-                      <h2>Graphe des erreurs</h2>
-                      
-                      <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                      <div id="canvas-holder">
-                          <canvas id="canvas" style="width:360px; height:300px;"></canvas>
-                      </div>
+
+                <div class="col-md-4 col-sm-4">
+                    <div class="x_panel" style="height: 450px;">
+                      <div class="x_title">
+                        <h2>Graphe des erreurs</h2>
                         
-                    
-  
-                    </div>
-                  </div>
-                </div>
-                
-                
-                
-                <div class="col-md-4 col-sm-4  ">
-                  <div class="x_panel">
-                    <div class="x_title">
-                      <h2>Résultat</h2>
-                      
-                      <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                      
-                      <table class="table">
-                          <thead>
-                            <tr>
-                              <th>Fonction utilisée</th>
-                              <th>Valeur Obtenue</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>Erreur absolue moyenne</td>
-                              <td><samp id="mae"></samp></td>
-                            </tr>
-                            <tr>
-                              <td>Erreur quadratique moyenne</td>
-                              <td><samp id="mse"></samp></td>
-                            </tr>
-                            <tr>
-                              <td>Racine d'erreur quadratique moyenne</td>
-                              <td><samp id="rmse"></samp></td>
-                            </tr>
-                            <tr>
-                              <td>Score de variance expliqué</td>
-                              <td><samp id="vaf"></samp></td>
-                            </tr>
-                            <tr>
-                              <td>Coefficient de corrélation de Pearson</td>
-                              <td><samp id="corr"></samp></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <br>
-                    </div>
-                  </div>
-                </div>
-                
-                
-                <div class="col-md-4 col-sm-4 ">
-                  <div class="x_panel fixed_height_500">
-                    <div class="x_title">
-                      <h2>Visualisation de données</h2>
-                      
-                      <div class="clearfix"></div>
-                    </div>
-                    <div class="x_content">
-                        <div id="canvas-holder">
-                            <canvas id="echart_pie" style="width:360px; height:300px;"></canvas>
-                        </div>
-                      
-  
-                      <div class="ml-50 col-md-12 col-sm-6">
-                          <input type="button" value="Visualiser les données" class="btn btn-primary ml-30" onclick="return visualiser()"> <!--  -->
-                     </div>
-  
-                    </div>
-                  </div>
-                </div>
-                
-                
-                
-          
-                
-  </div>
-               
-                          
-                          
-                          
-                          <div class="row">
-                        <div class="col-md-6">
-                          <div class="panel panel-body">
-                            <div class="x_title">
-                              <h4>Dataset d'entraînement Vs Dataset de validation</h4>
-                            </div>
-  
-                            <div id="canvas-holder">
-                              <canvas id="chart-area" style="width:360px; height:300px;"></canvas>
-                          </div>
-  
-                          </div>
-                        </div>
-  
-                        <div class="col-md-6">
-                          <div class="panel panel-body">
-                          <br>
-                            <div class="x_title">
-                              <h4></h4>
-                            </div>
-  
-                            <p>Le résultat de division de dataset</p>
-                            <table class="table table-striped">
-                              <thead>
-                                <tr>
-                                  <th style="width:20%"></th>
-                                  <th style="width:50%"></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <th>
-                                    <span class="count" id="nbrent"></span>
-                                  </th>
-                                  <td>: Nombre des données d'entraînement</td>
-                                </tr>
-                                <tr>
-                                  <th>
-                                    <span class="count" id="nbrval"></span>
-                                  </th>
-                                  <td>: Nombre des données de validation</td>
-                                </tr>
-                                <tr>
-                                  <th>
-                                    <span class="count" id="nbrtot"></span>
-                                  </th>
-                                  <td>: Nombre des données total</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
+                        <div class="clearfix"></div>
                       </div>
+                      <div class="x_content">
+                        <div id="canvas-holder">
+                            <canvas id="canvas" style="width:360px; height:360px;"></canvas>
+                        </div>
+                          
+                      
+    
+                      </div>
+                    </div>
+                  </div>
+                  
+                  
+                  
+                  <div class="col-md-4 col-sm-4  ">
+                    <div class="x_panel" style="height: 450px;">
+                      <div class="x_title">
+                        <h2>Résultat</h2>
+                        
+                        <div class="clearfix"></div>
+                      </div>
+                      <div class="x_content">
+                        
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <th>Fonction utilisée</th>
+                                <th>Valeur Obtenue</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>Erreur absolue moyenne</td>
+                                <td><samp id="mae"></samp></td>
+                              </tr>
+                              <tr>
+                                <td>Erreur quadratique moyenne</td>
+                                <td><samp id="mse"></samp></td>
+                              </tr>
+                              <tr>
+                                <td>Racine d'erreur quadratique moyenne</td>
+                                <td><samp id="rmse"></samp></td>
+                              </tr>
+                              <tr>
+                                <td>Score de variance expliqué</td>
+                                <td><samp id="vaf"></samp></td>
+                              </tr>
+                              <tr>
+                                <td>Coefficient de corrélation de Pearson</td>
+                                <td><samp id="corr"></samp></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <br>
+                      </div>
+                    </div>
+                  </div>
+
+
+
+                      </div>
+                      <div class="clearfix"></div>
+  
+                        
+            
                           
                           
                         </div>

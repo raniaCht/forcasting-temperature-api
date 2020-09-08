@@ -27,6 +27,22 @@
 
     {% endblock %}
 
+    <style>
+      #menu-rania:hover{
+        cursor: pointer;
+      }
+      .dropdown-item{
+        color: black;
+        text-decoration: none;
+        padding: 10px;
+      }
+      .dropdown-item:hover{
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    </style>
+
     
   </head>
 
@@ -54,6 +70,11 @@
                 {% endif %}
               {% endblock %}
             </ul> -->
+            <div class="dropdown nav navbar-nav pull-right" id="menu-rania" style="padding-left: 15px;">
+              <a href="{% url 'ModelsSimpleMulti:dataset' %}" class="navbar-brand">
+                Changer ville
+              </a>
+            </div>
           </div>
         </div>
       {% endblock %}
@@ -93,10 +114,14 @@
                     </button>
                     <ul class="dropdown-menu">
                       {% for format in available_formats %}
-                      
+                        
+                        {% if format != 'api' %}
                         <li>
                           <a class="js-tooltip format-option" href="{% add_query_param request api_settings.URL_FORMAT_OVERRIDE format %}" rel="nofollow" title="Make a GET request on the {{ name }} resource with the format set to `{{ format }}`">{{ format }}</a>
                         </li>
+                        {% endif %}
+                          
+                        
                       {% endfor %}
                     </ul>
                   </div>
@@ -110,9 +135,16 @@
           
 
           {% if options_form %}
-            <form class="button-form" action="{{ request.get_full_path }}" data-method="OPTIONS">
-              <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">OPTIONS</button>
-            </form>
+          
+          {% if request.get_full_path == '/models/multi/' %}
+          <form class="button-form" action="{% url 'ModelsSimpleMulti:modelsimpleactuel' %}">
+            <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">Actuelle</button>
+          </form>
+          {% else %}
+          <form class="button-form" action="{% url 'ModelsSimpleMulti:modelsimplemulti' %}">
+            <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">24 H</button>
+          </form>
+          {% endif %}
           {% endif %}
 
           {% if delete_form %}
