@@ -318,6 +318,7 @@ def set_dataset(request):
     ordre = request.POST['ordre']
     print('ordre ',ordre)
     type_mod,window,batch_size,optimizer,learning_rate,epochs = affectation_parametres_dataset(request)
+    print('type_model ====== ',type_mod)
     model =  loader_model(type_mod)
 
     opt = charger_opt(optimizer,learning_rate)
@@ -449,7 +450,7 @@ def set_dataset(request):
 
 def affectation_parametres_dataset(request):
 
-    type_mod = request.POST.get('type' , 'simple')
+    type_mod = request.POST.get('type_model' , 'simple')
 
     window = int(request.POST.get('window',parameter_entrainement[type_mod]['window']))
 

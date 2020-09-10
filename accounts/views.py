@@ -58,6 +58,7 @@ def transfer_learning(request):
     dataset_obj = Dataset.objects.get(id=idataset)
     model_obj = Model.objects.get(id=idmodel)
     type_mod,window,batch_size,optimizer,learning_rate,epochs = affectation_parametres_dataset(request)
+    type_mod = model_obj.type_mod
     opt = charger_opt(optimizer,learning_rate)
     dataset = pd.read_csv("C:/Users/Rania/Desktop/Api/src/"+dataset_obj.dataset.url,index_col=0,header=0)
     dataset.index = pd.to_datetime(dataset.index, format='%Y-%m-%d %H:%M:%S')
@@ -73,9 +74,10 @@ def transfer_learning(request):
     y_norm = y_norm.reshape(-1,1)
     y_norm = normalized_y.fit_transform(y_norm)
     y_normaliz = pd.DataFrame(y_norm,index=dataset.index, columns=['T (degC)'])
-
+    
 
     if type_mod == 'simple':
+        print('type_mod ani section simple',type_mod)
         series = series_to_supervised(y_normaliz, window=window)
         total = series.values.shape[0]
         y = series['T (degC)(t)']
@@ -107,6 +109,7 @@ def transfer_learning(request):
         Y_train = Y_train.reshape(Y_train.shape[0],)
         Y_valid = Y_valid.reshape(Y_valid.shape[0],)
     else:
+        print('type_mod ani section multi',type_mod)
         series = series_to_supervised(y_normaliz, window=window, lag=24, simple=False, single=False)
         total = series.values.shape[0]
         features = [('T (degC)(t+%d)' % (i)) for i in range(1, 25)]
@@ -154,11 +157,7 @@ def transfer_learning(request):
         VAF = explained_variance_score(Y_valid, lstm_valid_pred, multioutput='uniform_average')
         corr, _ = pearsonr(Y_valid.ravel(), lstm_valid_pred.ravel())
         print('MAE === ',MAE)
-    except Exception as error:
-        MAE = str(error)
-        print("error ===== ",str(error))
-
-    data = {
+        data = {
         'done':"done",
         'label' : [('%d' % (i)) for i in range(1, epochs +1)],
         'label_epoch' : [('Epoch %d' % (i)) for i in range(1, epochs+1)],
@@ -172,6 +171,11 @@ def transfer_learning(request):
         'total':total,
         'nbr_train':nbr_train,
         'nbr_valid':nbr_valid,
-    }
+        }
+    except Exception as error:
+        print("error ===== ",str(error))
+        data = {'error':str(error)}
+
+    
     #return render(request, 'models.html', {})
     return JsonResponse(data)
