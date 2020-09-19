@@ -147,7 +147,7 @@
               <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">OPTIONS</button>
             </form>
           {% endif %} -->
-
+            <br>
           {% if request.get_full_path == '/models/chosse-model/' %}
           <form class="button-form" action="{% url 'ModelsSimpleMulti:datasetactuelle' %}">
             <button class="btn btn-primary js-tooltip" title="Make an OPTIONS request on the {{ name }} resource">Actuelle</button>
@@ -245,7 +245,7 @@
                 
 
               <div class="response-info" aria-label="{% trans 'response info' %}">
-                <pre class="prettyprint"><span class="meta nocode"><b>HTTP {{ response.status_code }} {{ response.status_text }}</b>{% for key, val in response_headers|items %}
+                <pre class="prettyprint"><span class="meta nocode"><b>Les températures de 24h prochaines sont: {{ response.status_code }} {{ response.status_text }}</b>{% for key, val in response_headers|items %}
 <b>{{ key }}:</b> <span class="lit">{{ val|break_long_headers|urlize_quoted_links }}</span>{% endfor %}
 
 </span>{{ content|urlize_quoted_links }}
